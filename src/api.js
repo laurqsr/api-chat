@@ -6,17 +6,8 @@ app.use(express.json());
 
 const router = express.Router();
 
-//ROTAS
 app.use('/', router.get('/', (req, res, next) => {
-    res.status(200).send("<h1>API-CHAT</h1>");
-}));
-
-app.use('/', router.get('/sobre', (req, res, next) => {
-    res.status(200).send({
-        "nome" : "FARCHAT",
-        "autor" : "Felipe Alves Garcia",
-        "versao" : "0.1.0"
-    });
+    res.status(200).send("<h1>CHAT-API</h1>");
 }));
 
 app.use("/entrar", router.post("/entrar", async(req, res, next)=>{
@@ -38,6 +29,14 @@ app.use("/salas",router.get("/salas", async (req, res,next) => {
     }
 })) 
 
+app.use("/sala/listar", router.get("/sala/listar", async (req, res) => {
+    const token = require("./util/token");
+    const salaController = require("./controllers/salaController");
+    if(!token.checkToken(req.headers.token,req.headers.iduser,req.headers.nick)) return false;
+    let resp= await salaController.buscarMensagens(req.query.idSala, req.query.timestamp);
+    res.status(200).send(resp);
+}))
+
 app.use("/sala/entrar", router.post("/sala/entrar", async (req, res)=>{
     const token = require("./util/token");
     const salaController = require("./controllers/salaController");
@@ -56,14 +55,11 @@ app.use("/sala/enviar", router.post("/sala/enviar", async (req, res) => {
     let resp= await salaController.enviarMensagem(req.headers.nick, req.body.msg,req.body.idSala);
     res.status(200).send(resp);
 }))
-  
-app.use("/sala/listar", router.get("/sala/listar", async (req, res) => {
-    const token = require("./util/token");
-    const salaController = require("./controllers/salaController");
-    if(!token.checkToken(req.headers.token,req.headers.iduser,req.headers.nick)) return false;
-    let resp= await salaController.buscarMensagens(req.query.idSala, req.query.timestamp);
-    res.status(200).send(resp);
-}))
-module.exports = app;
 
-export default app;
+app.use('/', router.get('/sobre', (req, res, next) => {
+    res.status(200).send({
+        "nome" : "api-chat",
+        "autor" : "Laura Ribeiro",
+    });
+}));
+module.exports = app;
