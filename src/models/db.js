@@ -1,6 +1,5 @@
 const { MongoClient, ObjectId } = require("mongodb");
 require('dotenv').config();
-
 let singleton;
 
 async function connect (){
